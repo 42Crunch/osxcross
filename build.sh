@@ -113,6 +113,10 @@ if [ $NEED_TAPI_SUPPORT -eq 1 ]; then
 
   if [ $f_res -eq 1 ]; then
     pushd $CURRENT_BUILD_PROJECT_NAME &>/dev/null
+    # Alpine needs -D_LARGEFILE64_SOURCE for lseek64 and co
+    if grep -q "ID=alpine" /etc/os-release 2>/dev/null; then
+        sed -i 's/-DCMAKE_CXX_FLAGS="\(.*\)"/-DCMAKE_CXX_FLAGS="\1 -D_LARGEFILE64_SOURCE"/g' build.sh
+    fi
     INSTALLPREFIX=$TARGET_DIR ./build.sh
     ./install.sh
     popd &>/dev/null
